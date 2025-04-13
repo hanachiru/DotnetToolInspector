@@ -1,2 +1,3 @@
-# dotnet-tool-sdk-version
-Powershell code to get the version of the .NET SDK used by dotnettool.
+# DotnetToolSDKVersionChecker
+
+Powershell code to get the version of the .NET SDK used by dotnet tool.
