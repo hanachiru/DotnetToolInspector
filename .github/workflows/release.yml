@@ -1,0 +1,93 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      bump-level:
+        type: choice
+        options: [major, minor, patch]
+        required: true
+        default: patch
+        description: "The level of version bump to apply"
+
+permissions:
+  contents: read
+
+env:
+  MODULE_PATH: ./DotnetToolInspector
+  PSD1_PATH: ./DotnetToolInspector/DotnetToolInspector.psd1
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID_FOR_GITHUB_APP }}
+          private-key: ${{ secrets.PRIVATE_KEY_FOR_GITHUB_APP }}
+      - name: Get GitHub App User ID
+        id: get-user-id
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Check and Update Version
+        id: update-version
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          $ErrorActionPreference = 'Stop'
+
+          $manifest = Test-ModuleManifest $env:PSD1_PATH
+          $versionString = $manifest.Version.ToString()
+          Write-Output "Current Module Version: $versionString"
+
+          $newVersion = $manifest.Version
+          switch ('${{ github.event.inputs.bump-level }}') {
+              'major' { $newVersion = New-Object System.Version($([int]$manifest.Version.Major + 1), 0, 0) }
+              'minor' { $newVersion = New-Object System.Version($([int]$manifest.Version.Major), $([int]$manifest.Version.Minor + 1), 0) }
+              'patch' { $newVersion = New-Object System.Version($([int]$manifest.Version.Major), $([int]$manifest.Version.Minor), $([int]$manifest.Version.Build + 1)) }
+          }
+
+          Update-ModuleManifest -ModuleVersion $newVersion -Path $env:PSD1_PATH
+
+          $newManifest = Test-ModuleManifest $env:PSD1_PATH
+          $versionString = $newManifest.Version.ToString()
+          Write-Host "New Module Version: $versionString"
+          Write-Output "newVersion=${versionString}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+      - name: Commit and Push to Main
+        shell: bash
+        env:
+          VERSION: ${{ steps.update-version.outputs.newVersion }}
+        run: |
+          git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+          git config user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
+          git add "${PSD1_PATH}"
+          message="Update v${VERSION}"
+          git commit -m "${message}"
+          git push
+      - name: Publish to PowerShell Gallery
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          $ErrorActionPreference = 'Stop'
+
+          Publish-Module -Path $env:MODULE_PATH -NuGetApiKey ${{ secrets.POWERSHELL_GALLERY_API_KEY }} -Repository PSGallery -Force
+      - uses: release-drafter/release-drafter@v6
+        id: release-drafter
+        with:
+          publish: true
+          commitish: main
+          tag: v${{ steps.update-version.outputs.newVersion }}
+          name: v${{ steps.update-version.outputs.newVersion }}
+          version: ${{ steps.update-version.outputs.newVersion }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
