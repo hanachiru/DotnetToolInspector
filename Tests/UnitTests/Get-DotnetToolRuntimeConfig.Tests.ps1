@@ -2,7 +2,7 @@ BeforeAll {
     Import-Module "${PSScriptRoot}/../../DotnetToolInspector" -Force
 }
 
-Describe 'Get-DotnetToolTfm' {
+Describe 'Get-DotnetToolRuntimeConfig' {
     Context 'Nomal Scenario' {
         It '-global' {
             $packageID = "dotnet-t4"
@@ -10,7 +10,7 @@ Describe 'Get-DotnetToolTfm' {
             $expected = Get-Content "${PSScriptRoot}/../Data/home/.dotnet/tools/.store/dotnet-t4/3.0.0/dotnet-t4/3.0.0/tools/net6.0/any/t4.runtimeconfig.json"
 
             $env:DOTNET_CLI_HOME = "${PSScriptRoot}/../Data/home"
-            $actual = Get-DotnetToolTfm -packageID $packageID -commandName $commandName -global
+            $actual = Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -global
             Remove-Item Env:DOTNET_CLI_HOME
 
             $actual | Should -Be $expected
@@ -21,7 +21,7 @@ Describe 'Get-DotnetToolTfm' {
             $commandName = "t4"
             $expected = Get-Content "${PSScriptRoot}/../Data/tool-path/.store/dotnet-t4/3.0.0/dotnet-t4/3.0.0/tools/net6.0/any/t4.runtimeconfig.json"
 
-            $actual = Get-DotnetToolTfm -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/tool-path"
+            $actual = Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/tool-path"
             $actual | Should -Be $expected
         }
 
@@ -32,7 +32,7 @@ Describe 'Get-DotnetToolTfm' {
 
             Push-Location "${PSScriptRoot}/../Data/local"
             $env:NUGET_PACKAGES = "${PSScriptRoot}/../Data/nuget-cache"
-            $actual = Get-DotnetToolTfm -packageID $packageID -commandName $commandName -local
+            $actual = Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -local
             Remove-Item Env:NUGET_PACKAGES
             Pop-Location
             $actual | Should -Be $expected
@@ -45,7 +45,7 @@ Describe 'Get-DotnetToolTfm' {
 
             Push-Location "${PSScriptRoot}/../Data/local"
             $env:NUGET_PACKAGES = "${PSScriptRoot}/../Data/nuget-cache"
-            $actual = Get-DotnetToolTfm -packageID $packageID -commandName $commandName
+            $actual = Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName
             Remove-Item Env:NUGET_PACKAGES
             Pop-Location
             $actual | Should -Be $expected
@@ -59,7 +59,7 @@ Describe 'Get-DotnetToolTfm' {
 
             { 
                 $env:DOTNET_CLI_HOME = "${PSScriptRoot}/../Data/home"
-                Get-DotnetToolTfm -packageID $packageID -commandName $commandName -global
+                Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -global
                 Remove-Item Env:DOTNET_CLI_HOME
             } | Should -Throw
         }
@@ -70,7 +70,7 @@ Describe 'Get-DotnetToolTfm' {
 
             { 
                 $env:DOTNET_CLI_HOME = "${PSScriptRoot}/../Data/home"
-                Get-DotnetToolTfm -packageID $packageID -commandName $commandName -global
+                Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -global
                 Remove-Item Env:DOTNET_CLI_HOME
             } | Should -Throw
         }
@@ -79,21 +79,21 @@ Describe 'Get-DotnetToolTfm' {
             $packageID = "dotnet-t4"
             $commandName = "t4"
 
-            { Get-DotnetToolTfm -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/invalid" } | Should -Throw
+            { Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/invalid" } | Should -Throw
         }
 
         It 'Invalid PackageID (-toolPath)' {
             $packageID = "HogeHoge"
             $commandName = "t4"
 
-            { Get-DotnetToolTfm -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/tool-path" } | Should -Throw
+            { Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/tool-path" } | Should -Throw
         }
 
         It 'Invalid CommandName (-toolPath)' {
             $packageID = "dotnet-t4"
             $commandName = "HogeHoge"
 
-            { Get-DotnetToolTfm -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/tool-path" } | Should -Throw
+            { Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -toolPath "${PSScriptRoot}/../Data/tool-path" } | Should -Throw
         }
 
         It 'Invalid -local' {
@@ -102,7 +102,7 @@ Describe 'Get-DotnetToolTfm' {
 
             { 
                 $env:NUGET_PACKAGES = "${PSScriptRoot}/../Data/nuget-cache"
-                Get-DotnetToolTfm -packageID $packageID -commandName $commandName -local
+                Get-DotnetToolRuntimeConfig -packageID $packageID -commandName $commandName -local
                 Remove-Item Env:NUGET_PACKAGES
             } | Should -Throw
         }

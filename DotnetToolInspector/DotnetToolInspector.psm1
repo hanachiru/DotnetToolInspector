@@ -1,4 +1,4 @@
-function Get-DotnetToolTfm {
+function Get-DotnetToolRuntimeConfig {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
