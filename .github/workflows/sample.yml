@@ -17,6 +17,20 @@ jobs:
       - name: check out
         uses: actions/checkout@v4
 
+      # for tool-path
+      - name: Example -toolPath
+        id: toolpath
+        uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@feature/how-to-use
+        with:
+          package-id: dotnet-t4
+          command-name: t4
+          tool-path: ./Tests/Data/tool-path
+
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ steps.toolpath.outputs.framework-version-major-minor }}
+
       # for local
       # NOTE: If -local is used, 'dotnet tool restore' must be performed beforehand.
       - name: dotnet tool restore
@@ -24,9 +38,19 @@ jobs:
         run: |
           dotnet tool restore
       - name: Example -local
-        id: local
         uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@feature/how-to-use
         with:
           package-id: dotnet-t4
           command-name: t4
           working-directory: ./Tests/Data/local
+
+      # for global
+      - name: dotnet tool install
+        run: |
+          dotnet tool install dotnet-t4 --global
+      - name: Example -global
+        uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@feature/how-to-use
+        with:
+          package-id: dotnet-t4
+          command-name: t4
+          global: true
