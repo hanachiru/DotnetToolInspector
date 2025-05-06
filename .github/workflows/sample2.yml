@@ -11,7 +11,10 @@ on:
 jobs:
   sample:
     name: Sample Use Case
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       # for checkout Sample Data
       - name: Install Package
@@ -51,8 +54,10 @@ jobs:
       - name: Use -toolPath
         shell: pwsh
         run: |
-          dotnet tool install dotnet-t4 --tool-path ./Tests/Data/tool-path
-          $runtimeConfig = (Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4" -toolPath "./Tests/Data/tool-path")
+          $directory = "./Tests/Data/local/SampleToolPath"
+          New-Item -ItemType Directory -Path $directory -Force
+          dotnet tool install dotnet-t4 --tool-path $directory
+          $runtimeConfig = (Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4" -toolPath $directory)
           Write-Output "$runtimeConfig"
 
           # tfm and version
@@ -67,7 +72,7 @@ jobs:
         shell: pwsh
         working-directory: ./Tests/Data/local
         run: |
-          dotnet tool install dotnet-t4 ./Tests/Data/tool-path
+          dotnet tool install dotnet-t4
           $runtimeConfig = (Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4")
           Write-Output "$runtimeConfig"
 
