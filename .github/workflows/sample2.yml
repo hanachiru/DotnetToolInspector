@@ -1,0 +1,85 @@
+name: Sample2
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sample:
+    name: Sample Use Case
+    runs-on: ubuntu-latest
+    steps:
+      # for checkout Sample Data
+      - name: Install Package
+        shell: pwsh
+        run: |
+          # NOTE: Modules can be used in the same job.
+          Install-Module -Name DotnetToolInspector -Force -Scope CurrentUser
+
+          # check available module
+          Get-Module -ListAvailable DotnetToolInspector
+
+      # for checkout SampleData
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # for dotnet tool install
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.0"
+
+      # example -global
+      - name: Use -global
+        shell: pwsh
+        run: |
+          dotnet tool install dotnet-t4 --global
+          $runtimeConfig = (Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4" -global)
+          Write-Output "$runtimeConfig"
+
+          # tfm and version
+          $runtimeConfigJson = $runtimeConfig | ConvertFrom-Json
+          $tfm = $runtimeConfigJson.runtimeOptions.tfm
+          $version = $runtimeConfigJson.framework.version
+          Write-Output "tfm: $tfm"
+          Write-Output "version: $version"
+
+      # example -toolPath
+      - name: Use -toolPath
+        shell: pwsh
+        run: |
+          dotnet tool install dotnet-t4 --tool-path ./Tests/Data/tool-path
+          $runtimeConfig = (Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4" -toolPath "./Tests/Data/tool-path")
+          Write-Output "$runtimeConfig"
+
+          # tfm and version
+          $runtimeConfigJson = $runtimeConfig | ConvertFrom-Json
+          $tfm = $runtimeConfigJson.runtimeOptions.tfm
+          $version = $runtimeConfigJson.framework.version
+          Write-Output "tfm: $tfm"
+          Write-Output "version: $version"
+
+      # example -local
+      - name: Use -toolPath
+        shell: pwsh
+        working-directory: ./Tests/Data/local
+        run: |
+          dotnet tool install dotnet-t4 ./Tests/Data/tool-path
+          $runtimeConfig = (Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4")
+          Write-Output "$runtimeConfig"
+
+          # tfm and version
+          $runtimeConfigJson = $runtimeConfig | ConvertFrom-Json
+          $tfm = $runtimeConfigJson.runtimeOptions.tfm
+          $version = $runtimeConfigJson.framework.version
+          Write-Output "tfm: $tfm"
+          Write-Output "version: $version"
+
+      - name: Uninstall Package
+        if: always()
+        shell: pwsh
+        run: |
+          Uninstall-Module -Name DotnetToolInspector -Force -AllVersions
