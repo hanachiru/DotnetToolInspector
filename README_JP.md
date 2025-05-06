@@ -123,6 +123,8 @@ $ Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
 }
 ```
 
+事前に`dotnet tool restore`を実行していないと動作しないことに注意してください。
+
 ## CI/CD
 
 サンプルコードは[こちら](.github/workflows/sample.yml)にあります。
