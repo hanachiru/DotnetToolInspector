@@ -39,6 +39,7 @@ $ Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
     - [グローバルツール](#グローバルツール)
     - [ローカルツール](#ローカルツール)
   - [CI/CD](#CI/CD)
+  - [環境変数](#環境変数)
 
 # 要件
 
@@ -169,3 +170,19 @@ jobs:
     command-name: t4
     working-directory: ./Tests/Data/local
 ```
+
+## 環境変数
+
+以下の環境変数により挙動を変更できます。詳細は[公式ドキュメント](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-environment-variables)を参照してください。
+
+| **環境変数**    | **説明**                                                                                                                                                      | **デフォルト値**     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| DOTNET_CLI_HOME | .NET CLI コマンドのサポートファイルが書き込まれる場所を指定します。                                                                                           | 各 OS のデフォルト値 |
+| NUGET_PACKAGES  | [NuGet `global-packages` フォルダー](https://learn.microsoft.com/nuget/consume-packages/managing-the-global-packages-and-cache-folders)へのパスを設定します。 | 各 OS のデフォルト値 |
+
+`DOTNET_CLI_HOME` および `NUGET_PACKAGES` 環境変数のデフォルト値は、ランナーで使用されるオペレーティングシステムによって異なります:
+| **OS** | `DOTNET_CLI_HOME` | `NUGET_PACKAGES` |
+| ---------------------------- | -------------------------- | -------------------------- |
+| **Windows** | `%userprofile%\.dotnet\tools` | `%userprofile%\.nuget\packages` |
+| **Ubuntu** | `~/.dotnet/tools` | `~/.nuget/packages` |
+| **macOS** | `~/.dotnet/tools` | `~/.nuget/packages` |
