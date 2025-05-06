@@ -41,6 +41,12 @@ outputs:
   framework-version:
     description: 'The version of the framework'
     value: ${{ steps.runtimeconfig.outputs.framework-version }}
+  framework-version-major:
+    description: 'The major version of the framework'
+    value: ${{ steps.runtimeconfig.outputs.framework-version-major }}
+  framework-version-major-minor:
+    description: 'The major.minor version of the framework'
+    value: ${{ steps.runtimeconfig.outputs.framework-version-major-minor }}
 
 runs:
   using: 'composite'
@@ -90,6 +96,19 @@ runs:
           Write-Output "rollForward=${rollForward}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
           Write-Output "framework-name=${frameworkName}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
           Write-Output "framework-version=${frameworkVersion}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+
+          # Extract major and minor version
+          try{
+            $versionParts = $frameworkVersion -split '\.'
+            $majorVersion = $versionParts[0]
+            Write-Output "framework-version-major=${majorVersion}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+            
+            $minorVersion = $versionParts[1]
+            $majorMinorVersion = "$majorVersion.$minorVersion"
+            Write-Output "framework-version-major-minor=${majorMinorVersion}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+          } catch {
+            Write-Warning "Failed to extract major or minor version: $_"
+          }
 
           Pop-Location
         } catch {
