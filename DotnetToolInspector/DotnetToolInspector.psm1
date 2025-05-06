@@ -1,11 +1,42 @@
+<#
+.Synopsis
+    Get the runtimeconfig.json content for a .NET tool.
+.DESCRIPTION
+    This function retrieves the runtimeconfig.json content for a specified .NET tool package.
+    It can be used to check the version of the .NET SDK required by the tool.
+    The function supports both global and local installations of the .NET tool.
+    The function also supports custom tool paths.
+.PARAMETER packageID
+    The ID of the .NET tool package.
+.PARAMETER commandName
+    The name of the command to get the runtimeconfig.json for.
+.PARAMETER toolPath
+    The path to the .NET tool installation directory. If not specified, the default global or local path will be used.
+.PARAMETER global
+    Use the global installation path for the .NET tool.
+.PARAMETER local
+    Use the local installation path for the .NET tool.
+.EXAMPLE
+    # for global tool
+    Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4" -global
+.EXAMPLE
+    # use ToolPath
+    Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4" -toolPath "path\to\tools"
+.EXAMPLE
+    # for local tool
+    Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4" -local
+.EXAMPLE
+    # same -local
+    Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
+#>
 function Get-DotnetToolRuntimeConfig {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$packageID = "",
+        [string]$packageID,
 
         [Parameter(Mandatory = $true)]
-        [string]$commandName = "",
+        [string]$commandName,
         
         [string]$toolPath = "",
         [switch]$global = $false,
