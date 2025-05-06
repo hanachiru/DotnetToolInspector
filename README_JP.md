@@ -2,13 +2,33 @@
 
 [English](README.md) | 日本語
 
-DotnetToolInspector は dotnet tool の runtimeconfig.json の内容を取得することができる PowerShell のモジュールです。例えばインストールした dotnet tool を動作させるために必要な.NET SDK バージョンの確認に役立ちます。特に GitHub Actions で dotnet tool を利用するためにどの.NET SDK をインストールすれば良いのか特定するのに便利です。
+`DotnetToolInspector` は dotnet tool の `runtimeconfig.json` の内容を取得することができる PowerShell のモジュールです。
 
-DotnetToolInspector には以下の特徴があります。
+```
+# dotnet-t4 v3.0.0のt4コマンドに対応するruntimeconfig.jsonを取得する例
+$ Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
+{
+  "runtimeOptions": {
+    "tfm": "net6.0",
+    "rollForward": "LatestMajor",
+    "framework": {
+      "name": "Microsoft.NETCore.App",
+      "version": "6.0.0"
+    },
+    "configProperties": {
+      "System.Reflection.Metadata.MetadataUpdater.IsSupported": false
+    }
+  }
+}
+```
 
-- グローバルツール(--global と--tool-path の両方)とローカルツール(--local)に対応
+例えばインストールした dotnet tool を動作させるために必要な.NET SDK バージョンの確認に役立ちます。特に GitHub Actions で dotnet tool を利用するためにどの.NET SDK をインストールすれば良いのか調べるのに便利です。
+
+`DotnetToolInspector` には以下の特徴があります。
+
+- グローバルツール(--global と--tool-path)とローカルツール(--local)に対応
 - ubuntu・windows・macos で動作可能
-- CI/CD で利用するために action.yml を提供
+- CI/CD で利用するための action.yml を提供
 
 # 目次
 
@@ -122,7 +142,7 @@ jobs:
       # Check .NET SDK Version
       - name: Example -toolPath
         id: toolpath
-        uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@main
+        uses: hanachiru/DotnetToolInspector@main
         with:
           package-id: dotnet-t4
           command-name: t4
@@ -137,13 +157,13 @@ jobs:
 
 ローカルツールの情報を取得したい場合は、`dotnet tool restore`を先に実行する必要があるので注意してください。
 
-```
+```yml
 - name: dotnet tool restore
   working-directory: ./Tests/Data/local
   run: |
     dotnet tool restore
 - name: Example -local
-  uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@main
+  uses: hanachiru/DotnetToolInspector@main
   with:
     package-id: dotnet-t4
     command-name: t4

@@ -20,7 +20,7 @@ jobs:
       # for tool-path
       - name: Example -toolPath
         id: toolpath
-        uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@feature/how-to-use
+        uses: hanachiru/DotnetToolInspector@feature/how-to-use
         with:
           package-id: dotnet-t4
           command-name: t4
@@ -38,7 +38,7 @@ jobs:
         run: |
           dotnet tool restore
       - name: Example -local
-        uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@feature/how-to-use
+        uses: hanachiru/DotnetToolInspector@feature/how-to-use
         with:
           package-id: dotnet-t4
           command-name: t4
@@ -49,7 +49,7 @@ jobs:
         run: |
           dotnet tool install dotnet-t4 --global
       - name: Example -global
-        uses: hanachiru/DotnetToolInspector/Get-DotnetToolRuntimeConfig@feature/how-to-use
+        uses: hanachiru/DotnetToolInspector@feature/how-to-use
         with:
           package-id: dotnet-t4
           command-name: t4
