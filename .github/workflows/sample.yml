@@ -24,7 +24,7 @@ jobs:
         with:
           package-id: dotnet-t4
           command-name: t4
-          tool-path: ./Tests/Data/local/tool-path
+          tool-path: ./Tests/Data/tool-path
 
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v4
