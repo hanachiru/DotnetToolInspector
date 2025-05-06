@@ -1,0 +1,104 @@
+name: Get DotnetToolRuntimeConfig
+description: Get runtimeconfig.json of a dotnet tool
+inputs:
+  package-id:
+    description: 'The package ID of the tool'
+    required: true
+    default: ''
+  command-name:
+    description: 'The command name of the tool'
+    required: true
+    default: ''
+  global:
+    description: 'Use -global'
+    required: false
+    default: 'false'
+  tool-path:
+    description: 'use -toolPath'
+    required: false
+    default: ''
+  version:
+    description: 'Version of the module to install'
+    required: false
+    default: ''
+  working-directory:
+    description: 'Working directory'
+    required: false
+    default: '.'
+outputs:
+  runtimeconfig:
+    description: 'The runtimeconfig.json file'
+    value: ${{ steps.runtimeconfig.outputs.runtimeconfig }}
+  tfm:
+    description: 'The target framework moniker (TFM)'
+    value: ${{ steps.runtimeconfig.outputs.tfm }}
+  rollForward:
+    description: 'The roll forward setting'
+    value: ${{ steps.runtimeconfig.outputs.rollForward }}
+  framework-name:
+    description: 'The name of the framework'
+    value: ${{ steps.runtimeconfig.outputs.framework-name }}
+  framework-version:
+    description: 'The version of the framework'
+    value: ${{ steps.runtimeconfig.outputs.framework-version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Use Get-DotnetToolRuntimeConfig
+      id: runtimeconfig
+      shell: pwsh
+      run: |
+        if(-not '${{ inputs.version }}') {
+            Install-Module -Name DotnetToolInspector -Force
+        } else {
+            Install-Module -Name DotnetToolInspector -RequiredVersion ${{ inputs.version }} -Force
+        }
+
+        try {
+          $module = Get-InstalledModule -Name DotnetToolInspector
+          
+          $workingDirectory = '${{ inputs.working-directory }}'
+          Push-Location $workingDirectory
+          
+          if('${{ inputs.tool-path }}') {
+            $toolPath = '${{ inputs.tool-path }}'
+            $runtimeConfig = Get-DotnetToolRuntimeConfig `
+                -packageID '${{ inputs.package-id }}' `
+                -commandName '${{ inputs.command-name }}' `
+                -toolPath $toolPath
+          }
+          elseif('${{ inputs.global }}' -eq 'true') {
+            $runtimeConfig = Get-DotnetToolRuntimeConfig `
+                -packageID '${{ inputs.package-id }}' `
+                -commandName '${{ inputs.command-name }}' `
+                -global
+          } else {
+            $runtimeConfig = Get-DotnetToolRuntimeConfig `
+                -packageID '${{ inputs.package-id }}' `
+                -commandName '${{ inputs.command-name }}'
+          }
+
+          $runtimeConfigJson = $runtimeConfig | ConvertFrom-Json
+          $tfm = $runtimeConfigJson.runtimeOptions.tfm
+          $rollForward = $runtimeConfigJson.runtimeOptions.rollForward
+          $frameworkName = $runtimeConfigJson.runtimeOptions.framework.name
+          $frameworkVersion = $runtimeConfigJson.runtimeOptions.framework.version
+
+          Write-Output "runtimeconfig=${runtimeconfig}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+          Write-Output "tfm=${tfm}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+          Write-Output "rollForward=${rollForward}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+          Write-Output "framework-name=${frameworkName}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+          Write-Output "framework-version=${frameworkVersion}" | Tee-Object -FilePath ${env:GITHUB_OUTPUT} -Append
+
+          Pop-Location
+        } catch {
+          Write-Error "An error occurred during execution: $_"
+          throw
+        } finally {
+          if(-not '${{ inputs.version }}') {
+            Uninstall-Module -Name DotnetToolInspector -RequiredVersion $module.Version -Force
+          } else {
+            Uninstall-Module -Name DotnetToolInspector -RequiredVersion ${{ inputs.version }} -Force
+          }
+        }
