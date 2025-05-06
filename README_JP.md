@@ -4,7 +4,7 @@
 
 `DotnetToolInspector` は dotnet tool の `runtimeconfig.json` の内容を取得することができる PowerShell のモジュールです。
 
-```
+```shell
 # dotnet-t4 v3.0.0のt4コマンドに対応するruntimeconfig.jsonを取得する例
 $ Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
 {
