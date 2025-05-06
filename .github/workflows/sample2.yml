@@ -43,7 +43,7 @@ jobs:
           # tfm and version
           $runtimeConfigJson = $runtimeConfig | ConvertFrom-Json
           $tfm = $runtimeConfigJson.runtimeOptions.tfm
-          $version = $runtimeConfigJson.framework.version
+          $version = $runtimeConfigJson.runtimeOptions.framework.version
           Write-Output "tfm: $tfm"
           Write-Output "version: $version"
 
@@ -58,7 +58,7 @@ jobs:
           # tfm and version
           $runtimeConfigJson = $runtimeConfig | ConvertFrom-Json
           $tfm = $runtimeConfigJson.runtimeOptions.tfm
-          $version = $runtimeConfigJson.framework.version
+          $version = $runtimeConfigJson.runtimeOptions.framework.version
           Write-Output "tfm: $tfm"
           Write-Output "version: $version"
 
@@ -74,7 +74,7 @@ jobs:
           # tfm and version
           $runtimeConfigJson = $runtimeConfig | ConvertFrom-Json
           $tfm = $runtimeConfigJson.runtimeOptions.tfm
-          $version = $runtimeConfigJson.framework.version
+          $version = $runtimeConfigJson.runtimeOptions.framework.version
           Write-Output "tfm: $tfm"
           Write-Output "version: $version"
 
