@@ -65,6 +65,8 @@ $ Install-Module -Name DotnetToolInspector
 Get-DotnetToolRuntimeConfig [-packageID] <string> [-commandName] <string> [[-toolPath] <string>] [-global] [-local] [<CommonParameters>]
 ```
 
+dotnet tool の実行バイナリがマシンにインストールされていないと動作しないことに注意してください。ローカルツールの場合は事前に`dotnet tool restore`をしておく必要があります。
+
 以下は[dotnet-t4](https://www.nuget.org/packages/dotnet-t4#readme-body-tab)での例です。またサンプルコードは[こちら](.github/workflows/sample2.yml)にあります。
 
 ### グローバルツール
@@ -123,8 +125,6 @@ $ Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
 }
 ```
 
-事前に`dotnet tool restore`を実行していないと動作しないことに注意してください。
-
 ## CI/CD
 
 サンプルコードは[こちら](.github/workflows/sample.yml)と[こちら](.github/workflows/sample3.yml)にあります。
@@ -171,6 +171,20 @@ jobs:
     package-id: dotnet-t4
     command-name: t4
     working-directory: ./Tests/Data/local
+```
+
+`-global`を利用したい場合は`global: true`を設定します。
+
+```yml
+- name: dotnet tool install
+run: |
+    dotnet tool install dotnet-t4 --global
+- name: Example -global
+uses: hanachiru/DotnetToolInspector@main
+with:
+    package-id: dotnet-t4
+    command-name: t4
+    global: true
 ```
 
 ## 環境変数

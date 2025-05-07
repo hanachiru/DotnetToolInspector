@@ -65,6 +65,8 @@ Use `Get-DotnetToolRuntimeConfig` to retrieve the RuntimeConfig of a dotnet tool
 Get-DotnetToolRuntimeConfig [-packageID] <string> [-commandName] <string> [[-toolPath] <string>] [-global] [-local] [<CommonParameters>]
 ```
 
+Note that the dotnet tool executable binary must be installed on the machine for it to work. For local tools, `dotnet tool restore` must be done beforehand.
+
 Below is an example with [dotnet-t4](https://www.nuget.org/packages/dotnet-t4#readme-body-tab). Sample code is also available [here](.github/workflows/sample2.yml).
 
 ### Global Tools
@@ -123,8 +125,6 @@ $ Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
 }
 ```
 
-Note that this will only work if `dotnet tool restore` has been run beforehand.
-
 ## CI/CD
 
 Sample code is available [here](.github/workflows/sample.yml).
@@ -171,6 +171,20 @@ If you want to retrieve information about local tools, make sure to run `dotnet 
     package-id: dotnet-t4
     command-name: t4
     working-directory: ./Tests/Data/local
+```
+
+Set `global: true` if you want to use `-global`.
+
+```yml
+- name: dotnet tool install
+run: |
+    dotnet tool install dotnet-t4 --global
+- name: Example -global
+uses: hanachiru/DotnetToolInspector@main
+with:
+    package-id: dotnet-t4
+    command-name: t4
+    global: true
 ```
 
 ## Environment Variables
