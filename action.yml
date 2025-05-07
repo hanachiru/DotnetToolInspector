@@ -1,5 +1,9 @@
-name: Get DotnetToolRuntimeConfig
+name: DotnetTool RuntimeConfig Inspector
 description: Get runtimeconfig.json of a dotnet tool
+author: hanachiru
+branding:
+  icon: 'search'
+  color: 'blue'
 inputs:
   package-id:
     description: 'The package ID of the tool'
