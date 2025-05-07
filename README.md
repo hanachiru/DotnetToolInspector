@@ -177,11 +177,11 @@ Set `global: true` if you want to use `-global`.
 
 ```yml
 - name: dotnet tool install
-run: |
+  run: |
     dotnet tool install dotnet-t4 --global
 - name: Example -global
-uses: hanachiru/DotnetToolInspector@main
-with:
+  uses: hanachiru/DotnetToolInspector@main
+  with:
     package-id: dotnet-t4
     command-name: t4
     global: true
