@@ -1,5 +1,5 @@
 name: DotnetTool RuntimeConfig Inspector
-description: Get runtimeconfig.json of a dotnet tool
+description: Get runtimeconfig.json of dotnet tool
 author: hanachiru
 branding:
   icon: 'search'
