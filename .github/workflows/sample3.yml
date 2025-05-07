@@ -1,0 +1,33 @@
+name: Sample3
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sample:
+    name: Sample Use Case
+    runs-on: ubuntu-latest
+    steps:
+      - name: dotnet tool install
+        run: |
+          dotnet --list-sdks
+          dotnet tool install dotnet-t4 --global
+      - name: Example -global
+        id: get-runtimeconfig
+        uses: hanachiru/DotnetToolInspector@main
+        with:
+          package-id: dotnet-t4
+          command-name: t4
+          global: true
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ steps.get-runtimeconfig.outputs.framework-version-major }}
+      - name: list sdks
+        run: |
+          dotnet --list-sdks

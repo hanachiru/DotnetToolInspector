@@ -155,7 +155,7 @@ jobs:
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ steps.toolpath.outputs.framework-version-major-minor }}
+          dotnet-version: ${{ steps.toolpath.outputs.framework-version-major }}
 ```
 
 If you want to retrieve information about local tools, make sure to run `dotnet tool restore` beforehand.

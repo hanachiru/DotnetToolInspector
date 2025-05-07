@@ -127,7 +127,7 @@ $ Get-DotnetToolRuntimeConfig -packageID "dotnet-t4" -commandName "t4"
 
 ## CI/CD
 
-サンプルコードは[こちら](.github/workflows/sample.yml)にあります。
+サンプルコードは[こちら](.github/workflows/sample.yml)と[こちら](.github/workflows/sample3.yml)にあります。
 
 ```yaml
 name: Sample
@@ -155,7 +155,7 @@ jobs:
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ steps.toolpath.outputs.framework-version-major-minor }}
+          dotnet-version: ${{ steps.toolpath.outputs.framework-version-major }}
 ```
 
 ローカルツールの情報を取得したい場合は、`dotnet tool restore`を先に実行する必要があるので注意してください。
